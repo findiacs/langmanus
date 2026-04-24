@@ -1,17 +1,10 @@
 import logging
 from src.config import TEAM_MEMBERS
 from src.graph import build_graph
+from src.utils.logging import setup_logging, enable_debug_logging
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,  # Default level is INFO
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-
-
-def enable_debug_logging():
-    """Enable debug level logging for more detailed execution information."""
-    logging.getLogger("src").setLevel(logging.DEBUG)
+setup_logging()
 
 
 logger = logging.getLogger(__name__)
