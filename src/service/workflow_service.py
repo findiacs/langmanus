@@ -2,6 +2,7 @@ import logging
 
 from src.config import TEAM_MEMBERS
 from src.graph import build_graph
+from src.utils.message import extract_message_chunks
 from langchain_community.adapters.openai import convert_message_to_dict
 import uuid
 
@@ -120,23 +121,19 @@ async def run_agent_workflow(
                 "data": {"agent_name": node},
             }
         elif kind == "on_chat_model_stream" and node in streaming_llm_agents:
-            content = data["chunk"].content
-            if content is None or content == "":
-                if not data["chunk"].additional_kwargs.get("reasoning_content"):
-                    # Skip empty messages
-                    continue
+            content, reasoning_content = extract_message_chunks(data["chunk"])
+            if not content and not reasoning_content:
+                continue
+
+            if reasoning_content:
                 ydata = {
                     "event": "message",
                     "data": {
                         "message_id": data["chunk"].id,
-                        "delta": {
-                            "reasoning_content": (
-                                data["chunk"].additional_kwargs["reasoning_content"]
-                            )
-                        },
+                        "delta": {"reasoning_content": reasoning_content},
                     },
                 }
-            else:
+            elif content:
                 # Check if the message is from the coordinator
                 if node == "coordinator":
                     if len(coordinator_cache) < MAX_CACHE_SIZE:

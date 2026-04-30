@@ -8,6 +8,7 @@ from langgraph.graph import END
 
 from src.agents import research_agent, coder_agent, browser_agent
 from src.agents.llm import get_llm_by_type
+from src.utils.message import extract_message_chunks
 from src.config import TEAM_MEMBERS
 from src.config.agents import AGENT_LLM_MAP
 from src.prompts.template import apply_prompt_template
@@ -121,7 +122,9 @@ def planner_node(state: State) -> Command[Literal["supervisor", "__end__"]]:
     stream = llm.stream(messages)
     full_response = ""
     for chunk in stream:
-        full_response += chunk.content
+        content, _ = extract_message_chunks(chunk)
+        if content:
+            full_response += content
     logger.debug(f"Current state messages: {state['messages']}")
     logger.debug(f"Planner response: {full_response}")
 
