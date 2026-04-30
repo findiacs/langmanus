@@ -119,9 +119,10 @@ def planner_node(state: State) -> Command[Literal["supervisor", "__end__"]]:
             -1
         ].content += f"\n\n# Relative Search Results\n\n{json.dumps([{'titile': elem['title'], 'content': elem['content']} for elem in searched_content], ensure_ascii=False)}"
     stream = llm.stream(messages)
-    full_response = ""
+    full_response_chunks = []
     for chunk in stream:
-        full_response += chunk.content
+        full_response_chunks.append(chunk.content)
+    full_response = "".join(full_response_chunks)
     logger.debug(f"Current state messages: {state['messages']}")
     logger.debug(f"Planner response: {full_response}")
 
