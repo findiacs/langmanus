@@ -17,8 +17,14 @@ def bash_tool(
     logger.info(f"Executing Bash Command: {cmd}")
     try:
         # Execute the command and capture output
+        # Using ["/bin/bash", "-c", cmd] with shell=False is more secure than shell=True
+        # as it explicitly specifies the shell to be used and avoids implicit shell parsing.
         result = subprocess.run(
-            cmd, shell=True, check=True, text=True, capture_output=True
+            ["/bin/bash", "-c", cmd],
+            shell=False,
+            check=True,
+            text=True,
+            capture_output=True,
         )
         # Return stdout as the result
         return result.stdout
